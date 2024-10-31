@@ -22,6 +22,31 @@ builder.Services.AddAuthentication(options =>
         options.DefaultScheme = IdentityConstants.ApplicationScheme;
         options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
     })
+    .AddGoogle(options =>
+       {
+           IConfigurationSection googleAuthNSection =
+           builder.Configuration.GetSection("Authentication:Google");
+           options.ClientId = googleAuthNSection["ClientId"];
+           options.ClientSecret = googleAuthNSection["ClientSecret"];
+       })
+   .AddFacebook(options =>
+   {
+       IConfigurationSection FBAuthNSection =
+       builder.Configuration.GetSection("Authentication:FB");
+       options.ClientId = FBAuthNSection["ClientId"];
+       options.ClientSecret = FBAuthNSection["ClientSecret"];
+   })
+   .AddMicrosoftAccount(microsoftOptions =>
+   {
+       microsoftOptions.ClientId = builder.Configuration["Authentication:Microsoft:ClientId"];
+       microsoftOptions.ClientSecret = builder.Configuration["Authentication:Microsoft:ClientSecret"];
+   })
+   .AddTwitter(twitterOptions =>
+   {
+       twitterOptions.ConsumerKey = builder.Configuration["Authentication:Twitter:ConsumerAPIKey"];
+       twitterOptions.ConsumerSecret = builder.Configuration["Authentication:Twitter:ConsumerSecret"];
+       twitterOptions.RetrieveUserDetails = true;
+   })
     .AddIdentityCookies();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -47,10 +72,10 @@ else
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    //app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
