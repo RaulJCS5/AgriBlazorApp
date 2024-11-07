@@ -113,41 +113,8 @@ AgriBlazorApp.csproj
 2. **Ensure the Dockerfile Uses the Correct SDK and Runtime Versions:**
    Update your Dockerfile to use the .NET 8.0 SDK and runtime images.
 
-   ```dockerfile
-   # Stage 1: Build the application
-   FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-   WORKDIR /src
-
-   # Copy the project files and restore dependencies
-   COPY *.csproj ./
-   RUN dotnet restore
-
-   # Copy the rest of the application files
-   COPY . ./
-
-   # Build the application
-   RUN dotnet publish -c Release -o /app/publish
-
-   # Stage 2: Run the application
-   FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
-   WORKDIR /app
-   COPY --from=build /app/publish .
-
-   # Expose the port the app runs on
-   EXPOSE 80
-
-   # Run the application
-   ENTRYPOINT ["dotnet", "AgriBlazorApp.dll"]
-   ```
-
 3. **Build and Run the Docker Image:**
    Follow the steps to build and run the Docker image.
-
-   ```sh
-   cd "C:\Users\rs981105\OneDrive - PGA\Desktop\repo\AgriBlazorApp\AgriBlazorApp"
-   docker build -t agriblazorapp .
-   docker run -d -p 80:80 --name agriblazorapp-container agriblazorapp
-   ```
 
 ### Summary
 - Ensure your development environment supports .NET 8.0.
@@ -158,3 +125,26 @@ AgriBlazorApp.csproj
  file to `net8.0`.
 - Update your Dockerfile to use the .NET 8.0 SDK and runtime images.
 - Build and run the Docker image.
+
+To run your Docker container with the correct ports, you need to map the exposed ports in the Dockerfile to the host machine's ports. Here is how you can do it:
+
+### Step-by-Step Instructions
+
+1. **Build the Docker Image:**
+   Make sure you are in the directory where your Dockerfile is located. Run the following command to build the Docker image:
+   ```sh
+   docker build -t agriblazorapp .
+   ```
+
+2. **Run the Docker Container:**
+   Use the `docker run` command to start the container and map the ports. Since your Dockerfile exposes ports 8080 and 8081, you can map these ports to the host machine's ports.
+
+   ```sh
+   docker run -d -p 8080:8080 -p 8081:8081 --name agriblazorapp-container agriblazorapp
+   ```
+
+### Explanation
+- `docker build -t agriblazorapp .`: This command builds the Docker image and tags it as `agriblazorapp`.
+- `docker run -d -p 8080:8080 -p 8081:8081 --name agriblazorapp-container agriblazorapp`: This command runs the Docker container in detached mode (`-d`), maps port 8080 of the container to port 8080 of the host, maps port 8081 of the container to port 8081 of the host, and names the container `agriblazorapp-container`.
+
+This will start your Blazor web app in a Docker container, accessible via `http://localhost:8080` and `http://localhost:8081` on your machine.
