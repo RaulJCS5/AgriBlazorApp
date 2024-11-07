@@ -22,31 +22,31 @@ builder.Services.AddAuthentication(options =>
         options.DefaultScheme = IdentityConstants.ApplicationScheme;
         options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
     })
-    .AddGoogle(options =>
-       {
-           IConfigurationSection googleAuthNSection =
-           builder.Configuration.GetSection("Authentication:Google");
-           options.ClientId = googleAuthNSection["ClientId"];
-           options.ClientSecret = googleAuthNSection["ClientSecret"];
-       })
-   .AddFacebook(options =>
-   {
-       IConfigurationSection FBAuthNSection =
-       builder.Configuration.GetSection("Authentication:FB");
-       options.ClientId = FBAuthNSection["ClientId"];
-       options.ClientSecret = FBAuthNSection["ClientSecret"];
-   })
-   .AddMicrosoftAccount(microsoftOptions =>
-   {
-       microsoftOptions.ClientId = builder.Configuration["Authentication:Microsoft:ClientId"];
-       microsoftOptions.ClientSecret = builder.Configuration["Authentication:Microsoft:ClientSecret"];
-   })
-   .AddTwitter(twitterOptions =>
-   {
-       twitterOptions.ConsumerKey = builder.Configuration["Authentication:Twitter:ConsumerAPIKey"];
-       twitterOptions.ConsumerSecret = builder.Configuration["Authentication:Twitter:ConsumerSecret"];
-       twitterOptions.RetrieveUserDetails = true;
-   })
+   // .AddGoogle(options =>
+   //    {
+   //        IConfigurationSection googleAuthNSection =
+   //        builder.Configuration.GetSection("Authentication:Google");
+   //        options.ClientId = googleAuthNSection["ClientId"];
+   //        options.ClientSecret = googleAuthNSection["ClientSecret"];
+   //    })
+   //.AddFacebook(options =>
+   //{
+   //    IConfigurationSection FBAuthNSection =
+   //    builder.Configuration.GetSection("Authentication:FB");
+   //    options.ClientId = FBAuthNSection["ClientId"];
+   //    options.ClientSecret = FBAuthNSection["ClientSecret"];
+   //})
+   //.AddMicrosoftAccount(microsoftOptions =>
+   //{
+   //    microsoftOptions.ClientId = builder.Configuration["Authentication:Microsoft:ClientId"];
+   //    microsoftOptions.ClientSecret = builder.Configuration["Authentication:Microsoft:ClientSecret"];
+   //})
+   //.AddTwitter(twitterOptions =>
+   //{
+   //    twitterOptions.ConsumerKey = builder.Configuration["Authentication:Twitter:ConsumerAPIKey"];
+   //    twitterOptions.ConsumerSecret = builder.Configuration["Authentication:Twitter:ConsumerSecret"];
+   //    twitterOptions.RetrieveUserDetails = true;
+   //})
     .AddIdentityCookies();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");

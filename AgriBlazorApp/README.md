@@ -83,3 +83,78 @@ pull a container
 ```
 docker pull container-name
 ```
+
+To use .NET 8.0 in your Blazor Web App, you need to ensure that your development environment supports .NET 8.0. If you have the .NET 8.0 SDK installed, you can update your project and Dockerfile accordingly.
+
+### Step-by-Step Instructions
+
+1. **Update the Target Framework in Your Project File:**
+   Open your 
+
+AgriBlazorApp.csproj
+
+ file and ensure the `<TargetFramework>` element is set to `net8.0`.
+
+   ```xml
+   <Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+     <PropertyGroup>
+       <TargetFramework>net8.0</TargetFramework>
+       <Nullable>enable</Nullable>
+       <ImplicitUsings>enable</ImplicitUsings>
+       <UserSecretsId>aspnet-AgriBlazorApp-e9806664-765e-41e1-9bff-7b6ab6331834</UserSecretsId>
+     </PropertyGroup>
+
+     <!-- Other project settings -->
+
+   </Project>
+   ```
+
+2. **Ensure the Dockerfile Uses the Correct SDK and Runtime Versions:**
+   Update your Dockerfile to use the .NET 8.0 SDK and runtime images.
+
+   ```dockerfile
+   # Stage 1: Build the application
+   FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+   WORKDIR /src
+
+   # Copy the project files and restore dependencies
+   COPY *.csproj ./
+   RUN dotnet restore
+
+   # Copy the rest of the application files
+   COPY . ./
+
+   # Build the application
+   RUN dotnet publish -c Release -o /app/publish
+
+   # Stage 2: Run the application
+   FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+   WORKDIR /app
+   COPY --from=build /app/publish .
+
+   # Expose the port the app runs on
+   EXPOSE 80
+
+   # Run the application
+   ENTRYPOINT ["dotnet", "AgriBlazorApp.dll"]
+   ```
+
+3. **Build and Run the Docker Image:**
+   Follow the steps to build and run the Docker image.
+
+   ```sh
+   cd "C:\Users\rs981105\OneDrive - PGA\Desktop\repo\AgriBlazorApp\AgriBlazorApp"
+   docker build -t agriblazorapp .
+   docker run -d -p 80:80 --name agriblazorapp-container agriblazorapp
+   ```
+
+### Summary
+- Ensure your development environment supports .NET 8.0.
+- Update the `<TargetFramework>` in your 
+
+AgriBlazorApp.csproj
+
+ file to `net8.0`.
+- Update your Dockerfile to use the .NET 8.0 SDK and runtime images.
+- Build and run the Docker image.
