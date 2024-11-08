@@ -212,3 +212,9 @@ DotNetEnv.Env.Load();
 
 Environment.GetEnvironmentVariable("changeme");
 ```
+- [Why do people put the .env into gitignore?](https://stackoverflow.com/questions/43664565/why-do-people-put-the-env-into-gitignore)
+
+## [Safe storage of app secrets in development in ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-8.0&tabs=windows)
+
+-  how to manage sensitive data for an ASP.NET Core app on a development machine. Never store passwords or other sensitive data in source code or configuration files. Production secrets shouldn't be used for development or test. Secrets shouldn't be deployed with the app.
+
