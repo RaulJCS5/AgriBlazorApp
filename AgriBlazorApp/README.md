@@ -148,3 +148,67 @@ To run your Docker container with the correct ports, you need to map the exposed
 - `docker run -d -p 8080:8080 -p 8081:8081 --name agriblazorapp-container agriblazorapp`: This command runs the Docker container in detached mode (`-d`), maps port 8080 of the container to port 8080 of the host, maps port 8081 of the container to port 8081 of the host, and names the container `agriblazorapp-container`.
 
 This will start your Blazor web app in a Docker container, accessible via `http://localhost:8080` and `http://localhost:8081` on your machine.
+
+# Postgres
+
+## [running Blazor project using ASP.NET Identity and PostgreSQL with NET CLI](https://medium.com/@tomislav.medanovic/scaffolding-and-running-blazor-project-using-asp-net-identity-and-postgresql-with-net-cli-1fdb2a0d9778)
+
+- Install PostgreSQL — remember your user and pass (We will use superuser for this test)
+- You can also run pgAdmin to explore your database later on
+
+- - Add following packages to your project
+
+``` shell
+dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL
+dotnet add package Microsoft.EntityFrameworkCore.Tools
+```
+
+- Modfify appsettings.json
+
+``` json
+{
+ "Logging": {
+  "LogLevel": {
+   "Default": "Information",
+   "Microsoft.AspNetCore": "Warning"
+  }
+ },
+ "ConnectionStrings": {
+  "DefaultConnection": "Server=localhost;Port=5432;Database=blazor_test;Username=<user>;Password=<passowrd>"
+ }
+}
+```
+
+- Modify Program.cs to use PgSQL
+
+``` c#
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+ options.UseNpgsql(connectionString));
+```
+
+## How to list all databases in PostgreSQL?
+
+How to get the name of the current database from within PostgreSQL?
+
+The function current_database() returns the name of the current database:
+
+``` sql
+ SELECT current_database();
+```
+
+## [DotNetEnv](https://github.com/tonerdo/dotnet-env)
+
+``` shell
+
+PM> Install-Package DotNetEnv
+
+dotnet add package DotNetEnv
+```
+
+``` c#
+using DotNetEnv;
+DotNetEnv.Env.Load();
+
+Environment.GetEnvironmentVariable("changeme");
+```
