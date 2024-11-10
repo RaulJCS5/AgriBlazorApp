@@ -340,3 +340,39 @@ If you have a `.env` file in your project directory, Docker Compose will automat
 ## Final Result
 
 After following these steps, the application should successfully connect to the PostgreSQL database, and you should be able to manage the database using pgAdmin. The final setup ensures that the application and database services are correctly configured and can communicate with each other within the Docker network.
+
+# [How to add persistent data storage for PostgreSQL in Docker Compose](https://stackoverflow.com/questions/41637505/how-to-persist-data-in-a-dockerized-postgres-database-using-volumes)
+
+To add persistent data storage for the PostgreSQL database, you can define a volume in the docker-compose.yml file. This will ensure that the database data is stored outside of the container and persists even if the container is removed or recreated.
+
+Here is the updated docker-compose.yml with volume persistence:
+
+```yaml
+version: "3.8"
+services:
+  db:
+    container_name: postgres_container
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: test_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+```
+
+### Explanation
+
+- **Volumes**: The `volumes` section at the bottom of the 
+
+docker-compose.yml
+
+ file defines a named volume called `postgres_data`.
+- **Volume Mount**: The `volumes` section under the `db` service mounts the `postgres_data` volume to the `/var/lib/postgresql/data` directory inside the PostgreSQL container. This is where PostgreSQL stores its data files.
+
