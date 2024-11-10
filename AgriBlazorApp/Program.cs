@@ -58,16 +58,10 @@ builder.Services.AddAuthentication(options =>
 Env.Load();
 
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-connectionString = connectionString.Replace("${DB_HOST}", Environment.GetEnvironmentVariable("DB_HOST"))
-                                    .Replace("${DB_PORT}", Environment.GetEnvironmentVariable("DB_PORT"))
-                                    .Replace("${DB_DATABASE}", Environment.GetEnvironmentVariable("DB_DATABASE"))
-                                    .Replace("${DB_USERNAME}", Environment.GetEnvironmentVariable("DB_USERNAME"))
-                                    .Replace("${DB_PASSWORD}", Environment.GetEnvironmentVariable("DB_PASSWORD"));
-
+// Configure PostgreSQL connection
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 // Test the database connection
 TestDatabaseConnection(connectionString);

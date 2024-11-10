@@ -218,3 +218,100 @@ Environment.GetEnvironmentVariable("changeme");
 
 -  how to manage sensitive data for an ASP.NET Core app on a development machine. Never store passwords or other sensitive data in source code or configuration files. Production secrets shouldn't be used for development or test. Secrets shouldn't be deployed with the app.
 
+# [How to create a docker-compose setup with PostgreSQL and pgAdmin4](https://www.youtube.com/watch?v=qECVC6t_2mU)
+
+## Overview
+
+This provides a step-by-step guide to setting up a Dockerized ASP.NET Core application with a PostgreSQL database and pgAdmin for database management. It includes troubleshooting steps for common errors encountered during the setup process.
+
+## Prerequisites
+
+- Docker
+- Docker Compose
+
+## Configuration
+
+### Docker Compose File
+
+Create a 
+
+docker-compose.yml
+
+ file with the following content:
+
+- this code is for pgAdmin and PostgreSQL
+
+``` yaml
+version: "3.8"
+services:
+  db:
+    container_name: postgres_container
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: test_db
+    ports:
+      - "5434:5432"
+
+  pgadmin:
+    container_name: pgadmin4_container
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "5050:80"
+```
+
+- and this code is for the Blazor app
+
+``` yaml
+  app:
+    container_name: agri_blazorapp
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=test_db;Username=root;Password=root
+```
+
+## Common Errors and Solutions
+
+### Error: "Database connection failed due to PostgreSQL error: Failed to connect to 127.0.0.1:5432"
+
+**Solution**: Ensure the connection string uses the correct hostname and port. In Docker Compose, use the service name `db` as the hostname and the correct port (5432 this is default one).
+
+### Error: "Database connection failed due to an unexpected error: Name or service not known"
+
+**Solution**: Ensure the hostname in the connection string is `db`, which is the service name defined in 
+
+## Final Steps
+
+1. **Build and Run Containers**:
+   ```sh
+   docker-compose down
+   docker-compose up --build
+   ```
+
+2. **Verify PostgreSQL Connection**:
+   - Run `docker container ls` to list running containers.
+   - Run `docker inspect <postgres_container_id>` to get the IP address of the PostgreSQL container.
+
+3. **Access pgAdmin**:
+   - Open a browser and go to `http://localhost:5050`.
+   - Use the credentials `admin@admin.com` and `root` to log in.
+   - Add a new server in pgAdmin using the following details:
+     - **Name**: Any name you prefer (e.g., `whateveruwant`).
+     - **Host name/address**: The IP address obtained from the `docker inspect` command ex.(172.18.0.2).
+     - **Port**: `5432`
+     - **Username**: `root`
+     - **Password**: `root`
+
+## Final Result
+
+After following these steps, the application should successfully connect to the PostgreSQL database, and you should be able to manage the database using pgAdmin. The final setup ensures that the application and database services are correctly configured and can communicate with each other within the Docker network.
