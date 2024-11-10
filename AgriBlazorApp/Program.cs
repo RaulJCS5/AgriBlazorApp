@@ -57,10 +57,30 @@ builder.Services.AddAuthentication(options =>
 // Load .env file
 Env.Load();
 
+// Retrieve environment variables
+var dbHost = Environment.GetEnvironmentVariable("DB_HOST");
+var dbPort = Environment.GetEnvironmentVariable("DB_PORT");
+var dbDatabase = Environment.GetEnvironmentVariable("DB_DATABASE");
+var dbUsername = Environment.GetEnvironmentVariable("DB_USERNAME");
+var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
+
+if (string.IsNullOrEmpty(dbHost) || string.IsNullOrEmpty(dbPort) || string.IsNullOrEmpty(dbDatabase) || string.IsNullOrEmpty(dbUsername) || string.IsNullOrEmpty(dbPassword))
+{
+    throw new InvalidOperationException($"One or more required environment variables are not set. DB_HOST: {dbHost}, DB_PORT: {dbPort}, DB_DATABASE: {dbDatabase}, DB_USERNAME: {dbUsername}, DB_PASSWORD: {dbPassword}");
+}
+else
+{
+    Console.WriteLine("Environment variables loaded successfully.");
+    Console.WriteLine($"DB_HOST: {dbHost} + DB_PORT: {dbPort} + DB_DATABASE: {dbDatabase} + DB_USERNAME: {dbUsername} + DB_PASSWORD: {dbPassword}");
+}
 
 // Configure PostgreSQL connection
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+connectionString = connectionString.Replace("${DB_HOST}", Environment.GetEnvironmentVariable("DB_HOST"))
+                                    .Replace("${DB_PORT}", Environment.GetEnvironmentVariable("DB_PORT"))
+                                    .Replace("${DB_DATABASE}", Environment.GetEnvironmentVariable("DB_DATABASE"))
+                                    .Replace("${DB_USERNAME}", Environment.GetEnvironmentVariable("DB_USERNAME"))
+                                    .Replace("${DB_PASSWORD}", Environment.GetEnvironmentVariable("DB_PASSWORD")); builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 // Test the database connection
@@ -102,10 +122,13 @@ app.Run();
 
 void TestDatabaseConnection(string connectionString)
 {
+    Console.WriteLine("Testing database connection...");
+    Console.WriteLine("connectionString: " + connectionString);
+    using var connection = new NpgsqlConnection(connectionString);
     try
     {
-        using var connection = new NpgsqlConnection(connectionString);
         connection.Open();
+
         Console.WriteLine("Database connection successful.");
     }
     catch (NpgsqlException npgsqlEx)
@@ -127,5 +150,10 @@ void TestDatabaseConnection(string connectionString)
     {
         Console.WriteLine($"General error: {ex.Message}");
         throw new Exception($"Database connection failed due to an unexpected error: {ex.Message}");
+    }
+    finally
+    {
+        connection.Close();
+        Console.WriteLine("Database connection test complete.");
     }
 }

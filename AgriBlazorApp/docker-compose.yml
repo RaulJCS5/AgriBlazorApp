@@ -19,7 +19,12 @@ services:
     depends_on:
       - db
     environment:
-      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=test_db;Username=root;Password=root
+      # - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=test_db;Username=root;Password=root
+      - DB_HOST=${DB_HOST:-db}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_DATABASE=${DB_DATABASE:-test_db}
+      - DB_USERNAME=${DB_USERNAME:-root}
+      - DB_PASSWORD=${DB_PASSWORD:-root}
 
   pgadmin:
     container_name: pgadmin4_container

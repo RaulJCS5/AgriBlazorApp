@@ -280,6 +280,25 @@ services:
       - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=test_db;Username=root;Password=root
 ```
 
+- it also can work with environment variables by using the following code instead of using the default connection string
+
+``` yaml
+  app:
+    container_name: agri_blazorapp
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      # - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=test_db;Username=root;Password=root
+      - DB_HOST=${DB_HOST:-db}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_DATABASE=${DB_DATABASE:-test_db}
+      - DB_USERNAME=${DB_USERNAME:-root}
+      - DB_PASSWORD=${DB_PASSWORD:-root}
+```
+
 ## Common Errors and Solutions
 
 ### Error: "Database connection failed due to PostgreSQL error: Failed to connect to 127.0.0.1:5432"
@@ -289,6 +308,12 @@ services:
 ### Error: "Database connection failed due to an unexpected error: Name or service not known"
 
 **Solution**: Ensure the hostname in the connection string is `db`, which is the service name defined in 
+
+### Important Note
+
+If you have a `.env` file in your project directory, Docker Compose will automatically load environment variables from it. If the variables in the `.env` file conflict with those defined in the `docker-compose.yml` file, it can cause issues.
+
+**Solution**: Delete or rename the `.env` file if it is causing conflicts.
 
 ## Final Steps
 
