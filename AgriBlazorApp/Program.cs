@@ -54,8 +54,8 @@ builder.Services.AddAuthentication(options =>
    //})
     .AddIdentityCookies();
 
-// Load .env file
-Env.Load();
+// Load environment variables from postgres.env
+Env.Load("postgres.env");
 
 // Retrieve environment variables
 var dbHost = Environment.GetEnvironmentVariable("DB_HOST");

@@ -376,3 +376,82 @@ docker-compose.yml
  file defines a named volume called `postgres_data`.
 - **Volume Mount**: The `volumes` section under the `db` service mounts the `postgres_data` volume to the `/var/lib/postgresql/data` directory inside the PostgreSQL container. This is where PostgreSQL stores its data files.
 
+## Is it necessary to have the `env_file` in both the `app` and `db`
+
+Yes, it is necessary to have the `env_file` in both the app and `db` services if you want both services to use the environment variables defined in the `postgres.env` file. This ensures that both the application and the PostgreSQL database are configured correctly with the same environment variables.
+
+Here is the updated docker-compose.yml file with the `env_file` specified for both the app and `db` services:
+
+### Updated 
+
+docker-compose.yml
+
+```yaml
+version: "3.8"
+
+services:
+  db:
+    env_file:
+      - ./postgres.env
+
+  app:
+    env_file:
+      - ./postgres.env
+```
+
+### `postgres.env` File
+
+Ensure your `postgres.env` file contains the necessary environment variables for PostgreSQL:
+
+```env
+DB_HOST=changeme_dawg
+DB_PORT=changeme_dawg
+DB_DATABASE=changeme_dawg
+DB_USERNAME=changeme_dawg
+DB_PASSWORD=changeme_dawg
+```
+
+# apply changes made in the docker-compose.yml
+
+To apply changes made in the docker-compose.yml file without stopping and deleting the previous run, you can use the `docker-compose up` command with the `--no-deps` and `--build` options. This will rebuild the specified service and apply the changes without affecting the other running services.
+
+Here are the steps to apply the changes:
+
+1. **Rebuild the Service**: Use the `docker-compose up` command with the `--no-deps` and `--build` options to rebuild the specific service you want to update. For example, to rebuild the app
+
+ service:
+
+   ```sh
+   docker-compose up --no-deps --build app
+   ```
+
+   This command will rebuild the app service and apply the changes without stopping the other services.
+
+2. **Restart the Service**: If you need to restart the service to apply the changes, you can use the `docker-compose restart` command:
+
+   ```sh
+   docker-compose restart app
+   ```
+
+   This command will restart the app service without affecting the other running services.
+
+### Example Commands
+
+To rebuild and restart the `db` service:
+
+```sh
+docker-compose up --no-deps --build db
+docker-compose restart db
+```
+ service:
+
+To rebuild and restart the `app`
+
+```sh
+docker-compose up --no-deps --build app
+docker-compose restart app
+```
+
+### Note
+
+If you have made changes to the environment variables or volumes, you may need to restart the affected services to apply the changes. The `--no-deps` option ensures that the dependent services are not stopped or rebuilt.

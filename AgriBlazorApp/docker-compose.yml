@@ -1,13 +1,12 @@
 version: "3.8"
+
 services:
   db:
     container_name: postgres_container
     image: postgres
     restart: always
-    environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
-      POSTGRES_DB: test_db
+    env_file:
+      - ./postgres.env
     ports:
       - "5434:5432"
     volumes:
@@ -20,13 +19,8 @@ services:
       - "8080:8080"
     depends_on:
       - db
-    environment:
-      # - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=test_db;Username=root;Password=root
-      - DB_HOST=${DB_HOST:-db}
-      - DB_PORT=${DB_PORT:-5432}
-      - DB_DATABASE=${DB_DATABASE:-test_db}
-      - DB_USERNAME=${DB_USERNAME:-root}
-      - DB_PASSWORD=${DB_PASSWORD:-root}
+    env_file:
+      - ./postgres.env
 
   pgadmin:
     container_name: pgadmin4_container
