@@ -7,12 +7,18 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using DotNetEnv;
+using AgriBlazorApp;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddHttpClient<ChuckNorrisApiClient>(client =>
+{
+    client.BaseAddress = new Uri("https://api.chucknorris.io");
+});
 
 builder.Services.AddOutputCache();
 

@@ -1,5 +1,10 @@
 ﻿@inherits LayoutComponentBase
 
+@* Include the CSS file *@
+<head>
+    <link href="css/chucknorris.css" rel="stylesheet" />
+</head>
+
 <div class="page">
     <div class="sidebar">
         <NavMenu />
@@ -7,6 +12,7 @@
 
     <main>
         <div class="top-row px-4">
+            <p class="date-time">@currentDateTime.ToString("yyyy-MM-dd HH:mm:ss")</p>
             <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
         </div>
 
@@ -15,3 +21,24 @@
         </article>
     </main>
 </div>
+
+@code {
+    private DateTime currentDateTime = DateTime.Now;
+    private Timer? timer;
+
+    protected override void OnInitialized()
+    {
+        timer = new Timer(UpdateDateTime, null, 0, 1000);
+    }
+
+    private void UpdateDateTime(object? state)
+    {
+        currentDateTime = DateTime.Now;
+        InvokeAsync(() => StateHasChanged()); // Ensure the UI is updated
+    }
+
+    public void Dispose()
+    {
+        timer?.Dispose();
+    }
+}
