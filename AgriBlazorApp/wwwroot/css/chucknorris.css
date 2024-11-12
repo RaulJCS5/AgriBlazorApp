@@ -76,11 +76,24 @@
     animation: spin 1.2s linear infinite;
 }
 
+.top-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+}
+
 .date-time {
-    font-size: 2em;
+    font-size: 1em;
     font-family: 'Arial', sans-serif;
     color: rgb(0, 0, 0);
     text-align: center;
-    margin-top: 20px;
-    font-weight: bold;
+    margin-top: 10px;
+}
+
+.fa-clock-o {
+    font-size: 2em;
+    color: rgb(0, 0, 0);
+    margin-bottom: 10px;
 }

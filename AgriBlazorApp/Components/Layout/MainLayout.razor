@@ -14,10 +14,10 @@
 
     <main>
         <div class="top-row px-4">
-            <p role="status">Current count: @currentCount</p>
-
-            <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
-
+            <p class="date-time">
+                @currentDateTime.ToString("yyyy-MM-dd HH:mm:ss")
+                <i class="fa fa-clock-o" aria-hidden="true"></i>
+            </p>
             <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
         </div>
 
@@ -29,11 +29,22 @@
 
 
 @code {
-    private int currentCount = 0;
+    private DateTime currentDateTime = DateTime.Now;
+    private Timer? timer;
 
-    private void IncrementCount()
+    protected override void OnInitialized()
     {
-        currentCount++;
+        timer = new Timer(UpdateDateTime, null, 0, 1000);
     }
 
+    private void UpdateDateTime(object? state)
+    {
+        currentDateTime = DateTime.Now;
+        InvokeAsync(() => StateHasChanged()); // Ensure the UI is updated
+    }
+
+    public void Dispose()
+    {
+        timer?.Dispose();
+    }
 }
