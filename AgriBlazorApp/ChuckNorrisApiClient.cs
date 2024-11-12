@@ -13,8 +13,8 @@
         {
             try
             {
-                // Wait for 5 seconds before fetching the joke
-                await Task.Delay(5000, cancellationToken);
+                // Wait for 2 seconds before fetching the joke
+                await Task.Delay(2000, cancellationToken);
 
                 var joke = await _httpClient.GetFromJsonAsync<ChuckNorrisJoke>("/jokes/random", cancellationToken);
                 return (joke, null);

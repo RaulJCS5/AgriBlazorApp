@@ -1,7 +1,32 @@
 ﻿@page "/"
 
+@rendermode InteractiveServer
+
 <PageTitle>Home</PageTitle>
+
+<p class="date-time">@currentDateTime.ToString("yyyy-MM-dd HH:mm:ss")</p>
 
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
+
+@code {
+    private DateTime currentDateTime = DateTime.Now;
+    private Timer? timer;
+
+    protected override void OnInitialized()
+    {
+        timer = new Timer(UpdateDateTime, null, 0, 1000);
+    }
+
+    private void UpdateDateTime(object? state)
+    {
+        currentDateTime = DateTime.Now;
+        InvokeAsync(() => StateHasChanged()); // Ensure the UI is updated
+    }
+
+    public void Dispose()
+    {
+        timer?.Dispose();
+    }
+}

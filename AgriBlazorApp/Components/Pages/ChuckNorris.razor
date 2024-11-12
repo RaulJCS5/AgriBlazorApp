@@ -9,46 +9,41 @@
 <div class="joke-container">
     <div class="joke-center">
         <div class="joke-image"></div>
-            @if (isLoading)
+            @if (isFirstTime)
+            {
+                <p class="text-danger">Empty. Try me out.</p>
+            }
+            else if (isLoading)
             {
                 <div class="spinner"></div>
             }
             else
             {
-            <div class="joke-box">
-                @if (!string.IsNullOrEmpty(errorMessage))
-                {
-                    <p class="text-danger">@errorMessage</p>
-                }
-                else if (joke != null)
-                {
-                    <p class="joke-text">@joke.Value</p>
-                }                
-            </div>
+                <div class="joke-box">
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <p class="text-danger">@errorMessage</p>
+                    }
+                    else if (joke != null)
+                    {
+                        <p class="joke-text">@joke.Value</p>
+                    }                
+                </div>
             }
     </div>
     <button class="btn btn-primary mt-3" @onclick="GenerateNewJoke">Get New Joke</button>
     
-    <p class="date-time">@currentDateTime.ToString("yyyy-MM-dd HH:mm:ss")</p>
 </div>
 
 @code {
     private ChuckNorrisJoke? joke;
     private string? errorMessage;
     private bool isLoading = true;
-
-    private DateTime currentDateTime = DateTime.Now;
-    private Timer? timer;
+    private bool isFirstTime;
 
     protected override void OnInitialized()
     {
-        timer = new Timer(UpdateDateTime, null, 0, 1000);
-    }
-
-    private void UpdateDateTime(object? state)
-    {
-        currentDateTime = DateTime.Now;
-        InvokeAsync(StateHasChanged);
+        isFirstTime = true;
     }
 
     // To ensure that the joke is fetched only when the button is clicked and not when the page is opened, you need to separate the logic for fetching the joke from the `OnInitializedAsync` method and use a separate method for updating the joke. Additionally, you can remove the call to `OnInitializedAsync` from the button click event and replace it with the new method.
@@ -58,6 +53,8 @@
 
     private async Task GenerateNewJoke()
     {
+        isFirstTime = false;
+
         isLoading = true;
         errorMessage = null;
         joke = null;
@@ -67,11 +64,7 @@
         errorMessage = result.ErrorMessage;
         isLoading = false;
 
-        StateHasChanged(); // Refresh the component
+        InvokeAsync(() => StateHasChanged());  // Refresh the component
     }
 
-    public void Dispose()
-    {
-        timer?.Dispose();
-    }
 }
