@@ -1,0 +1,38 @@
+﻿@page "/blazormail"
+@using MailKit.Net.Smtp
+@using MimeKit
+<PageTitle>Page Email</PageTitle>
+
+<h1>Send Email</h1>
+
+<EditForm Model="EmailRequest" FormName="EmailForm" OnSubmit="SendEmail">
+    <InputText @bind-Value="EmailRequest.To" class="form-control mt-2" placeholder="To"></InputText>
+    <InputText @bind-Value="EmailRequest.Subject" class="form-control mt-2" placeholder="Subject"></InputText>
+    <InputTextArea @bind-Value="EmailRequest.Body" class="form-control mt-2" placeholder="Body"></InputTextArea>
+    <button type="submit" class="btn btn-primary mt-2">Send</button>
+</EditForm>
+
+@code {
+    [SupplyParameterFromForm(FormName = "EmailForm")]
+    EmailRequest EmailRequest { get; set; } = new EmailRequest();
+
+    void SendEmail(){
+        var email = new MimeMessage();
+        email.From.Add(MailboxAddress.Parse("alexandra.kling5@ethereal.email"));
+        email.To.Add(MailboxAddress.Parse(EmailRequest.To));
+        email.Subject = EmailRequest.Subject;
+        email.Body = new TextPart(MimeKit.Text.TextFormat.Html)
+        {
+            Text = EmailRequest.Body
+        };
+
+        using (var client = new SmtpClient())
+        {
+            client.Connect("smtp.ethereal.email", 587, MailKit.Security.SecureSocketOptions.StartTls);
+            // email and password created in https://ethereal.email/
+            client.Authenticate("alexandra.kling5@ethereal.email", "dDzXHCEsKRWBrzvgej");
+            client.Send(email);
+            client.Disconnect(true);
+        }
+    }
+}
