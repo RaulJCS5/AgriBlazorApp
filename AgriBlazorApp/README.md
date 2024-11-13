@@ -153,7 +153,7 @@ This will start your Blazor web app in a Docker container, accessible via `http:
 
 ## [running Blazor project using ASP.NET Identity and PostgreSQL with NET CLI](https://medium.com/@tomislav.medanovic/scaffolding-and-running-blazor-project-using-asp-net-identity-and-postgresql-with-net-cli-1fdb2a0d9778)
 
-- Install PostgreSQL — remember your user and pass (We will use superuser for this test)
+- Install PostgreSQL ï¿½ remember your user and pass (We will use superuser for this test)
 - You can also run pgAdmin to explore your database later on
 
 - - Add following packages to your project
@@ -218,3 +218,116 @@ Environment.GetEnvironmentVariable("changeme");
 
 -  how to manage sensitive data for an ASP.NET Core app on a development machine. Never store passwords or other sensitive data in source code or configuration files. Production secrets shouldn't be used for development or test. Secrets shouldn't be deployed with the app.
 
+# Controller
+
+## XUNIT Tests
+
+To test the `WeatherForecastsController` and the database connection code, you can use unit tests and integration tests. Here are the steps to set up and run these tests:
+
+### Step 1: Set Up Unit Tests for the Controller
+
+1. **Create a Test Project**:
+   ```sh
+   dotnet new xunit -o AgriBlazorServerApp.Tests
+   ```
+
+2. **Add References to the Test Project**:
+   - Add a reference to the main project:
+     ```sh
+     dotnet add AgriBlazorServerApp.Tests/AgriBlazorServerApp.Tests.csproj reference AgriBlazorServerApp/AgriBlazorServerApp.csproj
+     ```
+   - Add necessary NuGet packages:
+     ```sh
+     dotnet add AgriBlazorServerApp.Tests/AgriBlazorServerApp.Tests.csproj package Microsoft.EntityFrameworkCore.InMemory
+     dotnet add AgriBlazorServerApp.Tests/AgriBlazorServerApp.Tests.csproj package Moq
+     dotnet add AgriBlazorServerApp.Tests/AgriBlazorServerApp.Tests.csproj package Microsoft.AspNetCore.Mvc.Testing
+     ```
+
+3. **Create a Test Class for the Controller**:
+   - Create a new file `WeatherForecastsControllerTests.cs` in the test project:
+     ```csharp
+     using System.Threading.Tasks;
+     using Microsoft.AspNetCore.Mvc;
+     using Microsoft.EntityFrameworkCore;
+     using Moq;
+     using Xunit;
+     using AgriBlazorServerApp.Controllers;
+     using AgriBlazorServerApp.Data;
+
+     public class WeatherForecastsControllerTests
+     {
+         private readonly DbContextOptions<AgriBlazorServerAppContext> _options;
+
+         public WeatherForecastsControllerTests()
+         {
+             _options = new DbContextOptionsBuilder<AgriBlazorServerAppContext>()
+                 .UseInMemoryDatabase(databaseName: "TestDatabase")
+                 .Options;
+         }
+
+         [Fact]
+         public async Task Index_ReturnsViewResult_WithAListOfWeatherForecasts()
+         {
+             // Arrange
+             using var context = new AgriBlazorServerAppContext(_options);
+             context.WeatherForecast.Add(new WeatherForecast { Id = 1, Date = DateTime.Now, TemperatureC = 25, Summary = "Warm" });
+             context.WeatherForecast.Add(new WeatherForecast { Id = 2, Date = DateTime.Now, TemperatureC = 30, Summary = "Hot" });
+             context.SaveChanges();
+
+             var controller = new WeatherForecastsController(context);
+
+             // Act
+             var result = await controller.Index();
+
+             // Assert
+             var viewResult = Assert.IsType<ViewResult>(result);
+             var model = Assert.IsAssignableFrom<IEnumerable<WeatherForecast>>(viewResult.ViewData.Model);
+             Assert.Equal(2, model.Count());
+         }
+
+         // Additional tests for Details, Create, Edit, Delete, etc.
+     }
+     ```
+
+### Step 2: Set Up Integration Tests for the Database Connection
+
+1. **Create a Test Class for the Database Connection**:
+   - Create a new file `DatabaseConnectionTests.cs` in the test project:
+     ```csharp
+     using System;
+     using Npgsql;
+     using Xunit;
+
+     public class DatabaseConnectionTests
+     {
+         [Fact]
+         public void TestDatabaseConnection_Success()
+         {
+             // Arrange
+             var connectionString = "Host=changeme_dawg;Port=changeme_dawg;Database=changeme_dawg;Username=changeme_dawg;Password=changeme_dawg";
+
+             // Act & Assert
+             try
+             {
+                 using var connection = new NpgsqlConnection(connectionString);
+                 connection.Open();
+                 Assert.True(connection.State == System.Data.ConnectionState.Open);
+             }
+             catch (Exception ex)
+             {
+                 Assert.True(false, $"Database connection failed: {ex.Message}");
+             }
+         }
+     }
+     ```
+
+### Step 3: Run the Tests
+
+1. **Run the Tests**:
+   ```sh
+   dotnet test AgriBlazorServerApp.Tests/AgriBlazorServerApp.Tests.csproj
+   ```
+
+By following these steps, you can set up unit tests for the `WeatherForecastsController` and integration tests for the database connection. The unit tests ensure that the controller methods work as expected, while the integration tests verify that the database connection is successful.
+
+dotnet sln AgriBlazorApp/AgriBlazorApp.sln add AgriBlazorServerApp.Tests/AgriBlazorServerApp.Tests.csproj
