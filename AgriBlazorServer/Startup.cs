@@ -29,6 +29,12 @@ namespace AgriBlazorServer
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
+
+            // Register the IWeatherForecastService and its implementation
+            services.AddScoped<IWeatherForecastService, WeatherForecastService>();
+
+            // Add MVC services
+            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -54,6 +60,9 @@ namespace AgriBlazorServer
             {
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
+
+                // Map controller routes
+                endpoints.MapControllers();
             });
         }
     }
