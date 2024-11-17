@@ -1,6 +1,5 @@
 ﻿@inherits LayoutComponentBase
 
-@rendermode InteractiveServer
 
 @* Include the CSS file *@
 <head>
@@ -14,10 +13,13 @@
 
     <main>
         <div class="top-row px-4">
-            <span class="date-time">
-                @currentDateTime.ToString("yyyy-MM-dd HH:mm:ss")
-            </span>
-            <i class="fa fa-clock-o" aria-hidden="true"></i>
+            @if (!IsAccountPage)
+            {
+                <span class="date-time">
+                    @currentDateTime.ToString("yyyy-MM-dd HH:mm:ss")
+                </span>
+                <i class="fa fa-clock-o" aria-hidden="true"></i>
+            }
             <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
         </div>
 
@@ -31,6 +33,10 @@
 @code {
     private DateTime currentDateTime = DateTime.Now;
     private Timer? timer;
+    [CascadingParameter]
+    private HttpContext? HttpContext { get; set; }
+
+    private bool IsAccountPage => HttpContext?.Request.Path.StartsWithSegments("/Account") ?? false;
 
     protected override void OnInitialized()
     {
