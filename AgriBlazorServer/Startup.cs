@@ -35,6 +35,10 @@ namespace AgriBlazorServer
 
             // Add MVC services
             services.AddControllers();
+
+            // Register HttpClient with custom handler
+            services.AddHttpClient<WeatherForecastApiService>()
+                    .ConfigurePrimaryHttpMessageHandler(() => new CustomHttpClientHandler());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

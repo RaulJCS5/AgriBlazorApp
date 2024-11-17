@@ -1,7 +1,9 @@
 ﻿@page "/fetchdata"
 
 @using AgriBlazorServer.Data
-@inject WeatherForecastService ForecastService
+@using System.Net.Http.Json
+@inject HttpClient Http
+@inject WeatherForecastApiService ForecastService
 
 <h1>Weather forecast</h1>
 
@@ -41,6 +43,6 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+        forecasts = await ForecastService.GetWeatherForecastsAsync();
     }
 }
