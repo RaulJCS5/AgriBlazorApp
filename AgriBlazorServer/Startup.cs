@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,6 +41,26 @@ namespace AgriBlazorServer
             // Register HttpClient with custom handler
             services.AddHttpClient<WeatherForecastApiService>()
                     .ConfigurePrimaryHttpMessageHandler(() => new CustomHttpClientHandler());
+
+            // Configure PostgreSQL connection
+            // TODO: Replace the hard-coded values with environment variables
+            var dbHost = "changeme";
+            var dbPort = "changeme";
+            var dbName = "changeme";
+            var dbUser = "changeme";
+            var dbPassword = "changeme";
+
+            if (string.IsNullOrEmpty(dbHost) || string.IsNullOrEmpty(dbPort) || string.IsNullOrEmpty(dbName) || string.IsNullOrEmpty(dbUser) || string.IsNullOrEmpty(dbPassword))
+            {
+                throw new InvalidOperationException("Database connection information is missing. Please ensure all required environment variables are set.");
+            }
+
+            var connectionString = $"Host={dbHost};Port={dbPort};Database={dbName};Username={dbUser};Password={dbPassword}";
+
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseNpgsql(connectionString));
+            // Test the database connection
+            TestDatabaseConnection(connectionString);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -68,6 +90,35 @@ namespace AgriBlazorServer
                 // Map controller routes
                 endpoints.MapControllers();
             });
+        }
+        void TestDatabaseConnection(string connectionString)
+        {
+            try
+            {
+                using var connection = new NpgsqlConnection(connectionString);
+                connection.Open();
+                Console.WriteLine("Database connection successful.");
+            }
+            catch (NpgsqlException npgsqlEx)
+            {
+                Console.WriteLine($"PostgreSQL error: {npgsqlEx.Message}");
+                throw new Exception($"Database connection failed due to PostgreSQL error: {npgsqlEx.Message}");
+            }
+            catch (InvalidOperationException invalidOpEx)
+            {
+                Console.WriteLine($"Invalid operation: {invalidOpEx.Message}");
+                throw new Exception($"Database connection failed due to invalid operation: {invalidOpEx.Message}");
+            }
+            catch (ArgumentException argEx)
+            {
+                Console.WriteLine($"Argument error: {argEx.Message}");
+                throw new Exception($"Database connection failed due to an argument error: {argEx.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"General error: {ex.Message}");
+                throw new Exception($"Database connection failed due to an unexpected error: {ex.Message}");
+            }
         }
     }
 }

@@ -63,7 +63,7 @@
         errorMessage = result.ErrorMessage;
         isLoading = false;
 
-        InvokeAsync(() => StateHasChanged());  // Refresh the component
+        await InvokeAsync(StateHasChanged);  // Refresh the component
     }
 
 }

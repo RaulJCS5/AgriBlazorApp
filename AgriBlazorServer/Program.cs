@@ -1,3 +1,4 @@
+using DotNetEnv;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -13,6 +14,8 @@ namespace AgriBlazorServer
     {
         public static void Main(string[] args)
         {
+            // Load .env file
+            Env.Load();
             CreateHostBuilder(args).Build().Run();
         }
 
